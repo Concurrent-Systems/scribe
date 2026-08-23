@@ -1,0 +1,59 @@
+{
+  "name": "@concurrent-systems/scribe",
+  "version": "1.0.0",
+  "description": "A structured operational log for Bun and Node. One line per record, six fields, one identifier.",
+  "license": "MIT",
+  "author": "Concurrent Systems (Pty) Ltd",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Concurrent-Systems/scribe.git"
+  },
+  "homepage": "https://github.com/Concurrent-Systems/scribe#readme",
+  "bugs": {
+    "url": "https://github.com/Concurrent-Systems/scribe/issues"
+  },
+  "keywords": [
+    "logging",
+    "logger",
+    "structured-logging",
+    "bun",
+    "typescript",
+    "observability"
+  ],
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "bun": {
+        "types": "./src/index.ts",
+        "default": "./src/index.ts"
+      },
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && bunx tsc -p tsconfig.build.json",
+    "test": "bun test tests/",
+    "lint": "bunx biome check --error-on-warnings src/ tests/",
+    "lint:fix": "bunx biome check --write --error-on-warnings src/ tests/",
+    "typecheck": "bunx tsc --noEmit"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.9",
+    "@types/bun": "^1.4.0",
+    "typescript": "^7.0.2"
+  }
+}

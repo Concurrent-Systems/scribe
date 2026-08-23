@@ -1,0 +1,18 @@
+{
+  // The published build. `tsconfig.json` type-checks the repository and emits
+  // nothing; this one emits `dist/` and never looks at `tests/`.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": "dist",
+    "rootDir": "src",
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    // Source is written with `.ts` on relative imports, which is what Bun
+    // reads. On emit those are rewritten to `.js` so the output is a real
+    // Node ES module rather than one that resolves nowhere.
+    "rewriteRelativeImportExtensions": true
+  },
+  "include": ["src/**/*.ts"]
+}

@@ -1,0 +1,30 @@
+# A library nothing tests on push is a library that breaks its consumers.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # `bun-version-file`, never a literal and never `latest`. A pin that
+      # anything else is allowed to restate is not a pin.
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+
+      - run: bun install --frozen-lockfile
+
+      - run: bun run lint
+
+      - run: bun run typecheck
+
+      - run: bun test

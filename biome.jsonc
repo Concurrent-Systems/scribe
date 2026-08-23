@@ -1,0 +1,59 @@
+{
+  // `.jsonc`, not `.json`, because a rule that is off must say why it is off,
+  // and `biome.json` does not accept a comment. A comment added there does not
+  // fail -- it invalidates the block that contains it, and the setting is
+  // simply never applied.
+  "$schema": "https://biomejs.dev/schemas/2.5.9/schema.json",
+  "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "files": {
+    "includes": ["src/**", "tests/**"]
+  },
+  "linter": {
+    "enabled": true,
+    // Nothing is off. If that changes, the reason goes on the line above the
+    // rule, in this file -- never in a command flag, a threshold, or a quiet
+    // exclusion.
+    "rules": {
+      "recommended": true,
+      "complexity": { "recommended": true },
+      "correctness": { "recommended": true },
+      "performance": { "recommended": true },
+      "security": { "recommended": true },
+      "style": { "recommended": true },
+      "suspicious": {
+        "recommended": true,
+        // `any` switches the compiler off for everything downstream of it.
+        // scribe is clean and holds this.
+        "noExplicitAny": "error"
+      }
+    }
+  },
+  "overrides": [
+    {
+      // `src/` is what ships, and every service loads it on its hot path. It
+      // is held to more than the tests are, never less.
+      "includes": ["src/**"],
+      "linter": {
+        "rules": {
+          "performance": {
+            // A literal regex inside a function is a fresh compile per call.
+            // `safeValue` runs once per field, per record.
+            "useTopLevelRegex": "error"
+          },
+          "suspicious": {
+            // scribe writes to a file descriptor it was given. A library that
+            // reaches for `console` has decided where a consumer's records go.
+            // A benchmark in `tests/` printing its result is a different thing.
+            "noConsole": "error"
+          }
+        }
+      }
+    }
+  ],
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 120
+  }
+}

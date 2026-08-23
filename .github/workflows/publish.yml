@@ -1,0 +1,55 @@
+# Publishing is what a GitHub release means. Nothing publishes from a branch,
+# and nothing publishes by hand from a laptop.
+name: Publish
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  # npm provenance. The published package carries a signed statement of the
+  # commit and the workflow that built it, which a consumer can verify.
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+
+      # npm does the publishing. Bun builds and tests, but `--provenance`
+      # needs the npm client.
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - run: bun install --frozen-lockfile
+
+      # The gate is the same one CI runs. A release is not a reason to skip it.
+      - run: bun run lint
+      - run: bun run typecheck
+      - run: bun test
+
+      - run: bun run build
+
+      # The tag is the version, or the release is wrong. Publishing a mismatch
+      # burns a version number that can never be reused.
+      - name: The tag and package.json must agree
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          pkg="$(node -p 'require("./package.json").version')"
+          if [ "$tag" != "$pkg" ]; then
+            echo "::error::release tag v${tag} does not match package.json ${pkg}"
+            exit 1
+          fi
+          echo "Publishing ${pkg}"
+
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
