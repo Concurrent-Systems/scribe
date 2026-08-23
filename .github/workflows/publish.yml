@@ -8,8 +8,8 @@ on:
 
 permissions:
   contents: read
-  # npm provenance. The published package carries a signed statement of the
-  # commit and the workflow that built it, which a consumer can verify.
+  # npm reads this to prove which workflow is publishing -- it is both the
+  # trusted-publisher credential and what signs the provenance statement.
   id-token: write
 
 jobs:
@@ -22,8 +22,8 @@ jobs:
         with:
           bun-version-file: .bun-version
 
-      # npm does the publishing. Bun builds and tests, but `--provenance`
-      # needs the npm client.
+      # npm does the publishing. Bun builds and tests, but provenance and
+      # trusted publishing need the npm client.
       - uses: actions/setup-node@v6
         with:
           node-version: 24
@@ -50,6 +50,9 @@ jobs:
           fi
           echo "Publishing ${pkg}"
 
-      - run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      # No token. npm trusts this workflow through OIDC, so there is no
+      # long-lived credential to leak. `--access public` is stated rather than
+      # left to `publishConfig`: a scoped package is private by default, and
+      # the first publish of 1.0.0 landed needing the visibility confirmed by
+      # hand.
+      - run: npm publish --access public

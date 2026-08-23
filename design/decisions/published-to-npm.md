@@ -39,6 +39,10 @@ From a GitHub release, never from a laptop.
 The publish workflow runs the same lint, typecheck and test gate that every push runs,
 and npm records which commit and which workflow produced the tarball.
 
+**No credential is stored anywhere.**
+npm trusts the workflow itself, through OIDC,
+so there is no publish token to leak, rotate or expire.
+
 **The tag and `package.json` must agree.**
 The workflow refuses a release whose tag does not match the version in the repository.
 Publishing a mismatch burns a version number that can never be reused.
