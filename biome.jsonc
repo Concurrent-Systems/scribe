@@ -3,7 +3,7 @@
   // and `biome.json` does not accept a comment. A comment added there does not
   // fail -- it invalidates the block that contains it, and the setting is
   // simply never applied.
-  "$schema": "https://biomejs.dev/schemas/2.5.9/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.13/schema.json",
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "files": {
     "includes": ["src/**", "tests/**"]
